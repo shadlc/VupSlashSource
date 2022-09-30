@@ -1,0 +1,9 @@
+
+general:ximoyou_jiweimowang role:renegade 
+general:nanyinnai_maomaotou role:loyalist 
+general:xiaorou_rhoxingai role:lord starter:true 
+general:xingzhigumiya_mengmao role:loyalist 
+general:toufa_shiyixian role:rebel 
+general:laila_xuelie role:rebel 
+general:liantai_bingyuanlangwang role:rebel 
+general:xiyue_shenshengxuantu role:rebel 
