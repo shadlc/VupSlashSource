@@ -43,5 +43,5 @@ if __name__ == '__main__':
 	info_json['source_url'] = 'https://github.com/shadlc/VupSlashSource/raw/main/main/'
 	info_json['files'] = get_files_list('../main/', info_json['source_url'])
 	json_name = 'hash_list.json'
-	os.chdir('../')
+	os.chdir('../hash_list')
 	save_json(info_json, json_name)
