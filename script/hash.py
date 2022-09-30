@@ -12,7 +12,7 @@ def get_files_list(directory, update_url):
 			file_name = (root.replace('\\','/') + '/' + file).replace('./','')
 			file_hash = checksum(file_name)
 			file_size = os.path.getsize(file_name)
-			file_list[file_name] = {'file_hash':file_hash, 'file_size':file_size, 'file_url':file_url}
+			file_list[file_name] = {'file_hash':file_hash, 'file_size':file_size}
 	return(file_list)
 
 def checksum(file_name, hash_factory=hashlib.md5, chunk_num_blocks=128):
