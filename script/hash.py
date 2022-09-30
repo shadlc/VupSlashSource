@@ -40,7 +40,7 @@ if __name__ == '__main__':
 	info_json['discription'] = 'A Sanguosha like game but characters is vup'
 	info_json['author'] = '萌龙少主'
 	info_json['website'] = 'https://vupslash.icu'
-	info_json['source_url'] = 'https://gitee.com/shadlc/vup-slash-source/raw/master/main/'
+	info_json['source_url'] = 'https://github.com/shadlc/VupSlashSource/raw/main/main/'
 	info_json['files'] = get_files_list('../main/', info_json['source_url'])
 	json_name = 'hash_list.json'
 	os.chdir('../')
