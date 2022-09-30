@@ -9,10 +9,9 @@ def get_files_list(directory, update_url):
 	os.chdir(directory)
 	for root, dirs, files in os.walk('.'):
 		for file in files:
-			file_name = root.replace('\\','/') + '/' + file
+			file_name = (root.replace('\\','/') + '/' + file).replace('./','')
 			file_hash = checksum(file_name)
 			file_size = os.path.getsize(file_name)
-			file_url = update_url + file_name.replace('./','')
 			file_list[file_name] = {'file_hash':file_hash, 'file_size':file_size, 'file_url':file_url}
 	return(file_list)
 
