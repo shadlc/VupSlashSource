@@ -41,7 +41,7 @@ jobs:
           cd ./script
           python3 hash.py
           cd ../web
-          brach_name = ${{ github.ref }}
+          brach_name = "${{ github.ref }}"
           mv hash_list.json ${brach_name##*/}.json
 
       - name: Setup Pages
