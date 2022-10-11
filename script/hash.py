@@ -43,6 +43,6 @@ if __name__ == '__main__':
 	info_json['website'] = 'https://vupslash.icu'
 	info_json['source_url'] = f'https://github.com/shadlc/VupSlashSource/raw/{branch_name}/main/'
 	info_json['files'] = get_files_list(f'../main/', info_json['source_url'])
-	json_name = f'{branch_name}.json'
+	json_name = f'hash_list.json'
 	os.chdir('../web')
 	save_json(info_json, json_name)
