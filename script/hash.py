@@ -38,7 +38,7 @@ if __name__ == '__main__':
 	info_json = {}
 	info_json['name'] = 'VupSlash'
 	info_json['version'] = read_version(f'../{branch_name}/',version_file)
-	info_json['discription'] = 'A Sanguosha like game but characters is vup'
+	info_json['description'] = 'A Sanguosha like game but characters is vup'
 	info_json['author'] = '萌龙少主'
 	info_json['website'] = 'https://vupslash.icu'
 	info_json['source_url'] = f'https://github.com/shadlc/VupSlashSource/raw/{branch_name}/main/'
