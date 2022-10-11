@@ -34,7 +34,7 @@ def read_version(directory, file):
 if __name__ == '__main__':
 	version_file = 'version.ini'
 	info_json = {}
-	info_json['name'] = 'vupslash'
+	info_json['name'] = 'VupSlash'
 	info_json['version'] = read_version('../main/',version_file)
 	info_json['discription'] = 'A Sanguosha like game but characters is vup'
 	info_json['author'] = '萌龙少主'
@@ -42,5 +42,5 @@ if __name__ == '__main__':
 	info_json['source_url'] = 'https://github.com/shadlc/VupSlashSource/raw/main/main/'
 	info_json['files'] = get_files_list('../main/', info_json['source_url'])
 	json_name = 'hash_list.json'
-	os.chdir('../hash_list')
+	os.chdir('../web')
 	save_json(info_json, json_name)

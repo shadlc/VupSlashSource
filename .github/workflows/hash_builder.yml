@@ -40,6 +40,7 @@ jobs:
         run: |
           cd ./script
           python3 hash.py
+          mv hash_list.json ${{ github.ref }}.json
 
       - name: Setup Pages
         uses: actions/configure-pages@v2
@@ -47,7 +48,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: './hash_list'
+          path: './web'
 
       - name: Deploy to GitHub Pages
         id: deployment
