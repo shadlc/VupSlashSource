@@ -36,13 +36,17 @@ jobs:
         with:
           python-version: 3.9
 
+      - name: Get branch info
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
+        id: branch_info
+
       - name: build hash list
         run: |
           cd ./script
           python3 hash.py
           cd ../web
-          brach_name = "${{ github.ref }}"
-          mv hash_list.json ${brach_name##*/}.json
+          mv hash_list.json ${{ steps.branch_info.outputs.name }}.json
 
       - name: Setup Pages
         uses: actions/configure-pages@v2
