@@ -23,9 +23,9 @@ def checksum(file_name, hash_factory=hashlib.md5, chunk_num_blocks=128):
 			h.update(chunk)
 	return h.hexdigest()
 
-def save_json(jsons, file):
+def save_json(info_json, file):
 	with open(file, 'w', encoding="utf-8") as f:
-		f.write(json.dumps(jsons, indent=2, ensure_ascii=False))
+		f.write(json.dumps(info_json, indent=2, ensure_ascii=False))
 
 def read_version(directory, file):
 	os.chdir(directory)
@@ -37,12 +37,12 @@ if __name__ == '__main__':
 	branch_name = sys.argv[1]
 	info_json = {}
 	info_json['name'] = 'VupSlash'
-	info_json['version'] = read_version(f'../{branch_name}/',version_file)
+	info_json['version'] = read_version('../main/',version_file)
 	info_json['description'] = 'A Sanguosha like game but characters is vup'
 	info_json['author'] = '萌龙少主'
 	info_json['website'] = 'https://vupslash.icu'
 	info_json['source_url'] = f'https://github.com/shadlc/VupSlashSource/raw/{branch_name}/main/'
-	info_json['files'] = get_files_list(f'../{branch_name}/', info_json['source_url'])
-	json_name = 'hash_list.json'
+	info_json['files'] = get_files_list(f'../main/', info_json['source_url'])
+	json_name = f'{branch_name}.json'
 	os.chdir('../web')
 	save_json(info_json, json_name)
