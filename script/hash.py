@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+import sys
 import json
 import hashlib
 
@@ -33,14 +34,15 @@ def read_version(directory, file):
 		
 if __name__ == '__main__':
 	version_file = 'version.ini'
+	branch_name = sys.argv[1]
 	info_json = {}
 	info_json['name'] = 'VupSlash'
-	info_json['version'] = read_version('../main/',version_file)
+	info_json['version'] = read_version(f'../{branch_name}/',version_file)
 	info_json['discription'] = 'A Sanguosha like game but characters is vup'
 	info_json['author'] = '萌龙少主'
 	info_json['website'] = 'https://vupslash.icu'
-	info_json['source_url'] = 'https://github.com/shadlc/VupSlashSource/raw/main/main/'
-	info_json['files'] = get_files_list('../main/', info_json['source_url'])
+	info_json['source_url'] = f'https://github.com/shadlc/VupSlashSource/raw/{branch_name}/main/'
+	info_json['files'] = get_files_list(f'../{branch_name}/', info_json['source_url'])
 	json_name = 'hash_list.json'
 	os.chdir('../web')
 	save_json(info_json, json_name)

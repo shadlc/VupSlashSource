@@ -1,11 +1,11 @@
 name: HashBuilder
 
-on:
+on: [push]
   # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  # push:
+  #   branches: [ "main" ]
+  # pull_request:
+  #   branches: [ "main" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -38,15 +38,13 @@ jobs:
 
       - name: Get branch info
         shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
+        run: echo "##[set-output name=name;]$(echo ${GITHUB_REF##*/})"
         id: branch_info
 
       - name: build hash list
         run: |
           cd ./script
-          python3 hash.py
-          cd ../web
-          mv hash_list.json ${{ steps.branch_info.outputs.name }}.json
+          python3 hash.py ${{ steps.branch_info.outputs.name }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v2
