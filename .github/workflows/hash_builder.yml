@@ -1,14 +1,14 @@
 name: HashBuilder
 
-on: [push]
+on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
-  # push:
-  #   branches: [ "main" ]
-  # pull_request:
-  #   branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
   # Allows you to run this workflow manually from the Actions tab
-  # workflow_dispatch:
+  workflow_dispatch:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
@@ -41,7 +41,7 @@ jobs:
         run: echo "##[set-output name=name;]$(echo ${GITHUB_REF##*/})"
         id: branch_info
 
-      - name: build hash list
+      - name: Build hash list
         run: |
           cd ./script
           python3 hash.py ${{ steps.branch_info.outputs.name }}
