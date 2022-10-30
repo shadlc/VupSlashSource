@@ -240,9 +240,9 @@ function sgs.getDefenseSlash(player, self)
 		defense = 0
 	end
 
-	if attacker:hasSkills("libeng") and player:getHandcardNum() < 2 then
-		defense = 0
-	end
+	--if attacker:hasSkills("libeng") and player:getHandcardNum() < 2 then
+	--	defense = 0
+	--end
 
 	if attacker:hasSkill("dahe") and player:hasFlag("dahe") and getKnownCard(player, attacker, "Jink", true, "he") == 0 and getKnownNum(player) == player:getHandcardNum()
 		and not (player:hasLordSkill("hujia") and hujiaJink >= 1) then
@@ -644,6 +644,7 @@ function sgs.isJinkAvailable(from, to, slash, judge_considered)
 			or (from:hasSkill("hunyin") and from:getMark("&hunyin_buff") > 0)	--混音
 			or (from:hasSkill("santan") and from:getMark("santan_counter") == 2)	--三叹
 			or (from:getPile("moci"):length() > 0 and from:getPile("moci"):length() > to:getHandcardNum())	--魔刺
+			or (from:getMark("&libeng") > 0)	--礼崩（新版）
 			)
 
 	--[[
@@ -1438,7 +1439,7 @@ function SmartAI:canHit(to, from, conservative)
 		end
 	end
 	
-	if from:hasSkills("libeng") and to:getHandcardNum() < 2 and wooden_ox_jink == 0 then return true end
+	--if from:hasSkills("libeng") and to:getHandcardNum() < 2 and wooden_ox_jink == 0 then return true end
 	if from:hasSkills("fenxin_S") and self:getOverflow(to) > 0 and not self:willSkipPlayPhase(to) and not self:isWeak(to) then return true end
 	
 	if to:objectName() == self.player:objectName() then
@@ -1550,7 +1551,7 @@ function SmartAI:useCardPeach(card, use)
 					or (enemy:hasSkill("tiaoxin") and (self.player:inMyAttackRange(enemy) and self:getCardsNum("Slash") < 1 or not self.player:canSlash(enemy)))
 					or (enemy:hasSkill("lihun") and self.player:isMale())
 					or enemy:hasSkills("yijue|fanjian|tianyi|jianchu|lieren|dimeng|gongxin|guixin|xianzhen|anxu|zhuikong|qiaoshui|xiansi|danshou|olpojun|olanxu|dahe|tanhu|yinling|gushe|xiashu|fenyue|zhidao|kuangbi|duliang|qinqing|jiyu|zhuandui|wenji|yaoming|guolun|ol_youdi|kannan|cuike|zuilun|zhengu|liangyin|lueming|tanbei|wuniang")
-					or enemy:hasSkills("libeng")
+					or enemy:hasSkills("libeng|chongya|suoqiu|newmoyin")
 					or (sgs.GetConfig("starfire", true) and enemy:hasSkill("liyu"))
 				)
 				then
@@ -2292,7 +2293,7 @@ sgs.ai_skill_cardask.aoe = function(self, data, pattern, target, name)
 	
 	local function before_return()
 		if is_clone_card then
-			card:deleteLater()
+			aoe:deleteLater()
 		end
 	end
 	
@@ -2300,7 +2301,8 @@ sgs.ai_skill_cardask.aoe = function(self, data, pattern, target, name)
 	local attacker = target
 	if menghuo and aoe:isKindOf("SavageAssault") then attacker = menghuo end
 
-	if not self:damageIsEffective(nil, nil, attacker, aoe) then before_return() return "." end
+	--if not self:damageIsEffective(nil, nil, attacker, aoe) then before_return() return "." end
+	if not self:damageIsEffective(self.player, sgs.DamageStruct_Normal, attacker, aoe) then before_return() return "." end
 	if self:getDamagedEffects(self.player, attacker) or self:needToLoseHp(self.player, attacker) then before_return() return "." end
 
 	--排除司馬徽隱士技能，AI司馬徽被打
@@ -3772,7 +3774,7 @@ function SmartAI:willUseLightning(card)
 		return true
 	elseif not hasDangerousFriend() then
 		--需要用牌就直接用
-		if self.player:hasSkills(sgs.need_kongcheng.."|shuoyi|xixue|motiao|zhanshu|zhuoshi") or self:needKongcheng() or self.player:getHandcardNum() > self:getBestKeepHandcardNum() then
+		if self.player:hasSkills(sgs.need_kongcheng.."|shuoyi|xixue|zhanshu|zhuoshi|jiezhi_zl") or self.player:getMark("&motiao_using") > 0 or self:needKongcheng() or self.player:getHandcardNum() > self:getBestKeepHandcardNum() then
 			return true
 		end
 		
@@ -4429,7 +4431,7 @@ function SmartAI:useCardFudichouxin(card, use)
     end
 	
 	--出牌阶段内优先抽自己的情况
-	if self.player:hasSkills("shuoyi|xixue|motiao") and self.player:getPhase() == sgs.Player_Play and not self.player:getEquips():isEmpty() and not self.room:isProhibited(self.player, self.player, card) and not self:isEquipLocking(self.player) then
+	if (self.player:hasSkills("shuoyi|xixue") or self.player:getMark("&motiao_using") > 0) and self.player:getPhase() == sgs.Player_Play and not self.player:getEquips():isEmpty() and not self.room:isProhibited(self.player, self.player, card) and not self:isEquipLocking(self.player) then
 		filluse(self.player, nil)
 		return
 	end
@@ -4534,7 +4536,7 @@ function SmartAI:useCardFudichouxin(card, use)
     end
 	
 	--需要用牌就随便找个人用了
-	if self.player:hasSkills(sgs.need_kongcheng.."|shuoyi|xixue|motiao|zhanshu|zhuoshi") or self:needKongcheng() or self.player:getHandcardNum() > self:getBestKeepHandcardNum() then
+	if self.player:hasSkills(sgs.need_kongcheng.."|shuoyi|xixue|motiao|zhanshu|zhuoshi|jiezhi_zl") or self:needKongcheng() or self.player:getHandcardNum() > self:getBestKeepHandcardNum(self.player, 999) then
 		for _, p in sgs.qlist(self.room:getAlivePlayers()) do
 			if not p:getEquips():isEmpty() and not self.room:isProhibited(self.player, p, card) then
 				filluse(p, -1)

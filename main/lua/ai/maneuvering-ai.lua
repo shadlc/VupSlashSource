@@ -119,10 +119,10 @@ sgs.ai_skill_invoke.fan = function(self, data)
 
 	for _, target in sgs.qlist(use.to) do
 		if self:isFriend(target) then
-			if not self:damageIsEffective(target, sgs.DamageStruct_Fire, self.player) then return true end
+			if not self:damageIsEffective(target, sgs.DamageStruct_Fire, self.player, use.card) then return true end
 			if target:isChained() and self:isGoodChainTarget(target, nil, nil, nil, use.card) then return true end
 		else
-			if not self:damageIsEffective(target, sgs.DamageStruct_Fire, self.player) then return false end
+			if not self:damageIsEffective(target, sgs.DamageStruct_Fire, self.player, use.card) then return false end
 			if target:isChained() and not self:isGoodChainTarget(target, nil, nil, nil, use.card) then return false end
 			if target:hasArmorEffect("vine") or target:getMark("@gale") > 0 or (jinxuandi and jinxuandi:getMark("@wind") > 0) then
 				return true
@@ -244,6 +244,10 @@ function SmartAI:shouldUseAnaleptic(target, slash)
 	if target:hasSkills("yinqi") and target:isKongcheng() then
 		return false
 	end
+	--自己有抹挑自肃（反转了，喝酒过牌嘛）
+	--if self.player:getMark("&motiao_using") > 0 then
+	--	return false
+	--end
 	
 	--J.SP馬超刺槐
 	if self.player:getMark("@cihuai") > 0 and self:getCardsNum("Slash") == 0 then
@@ -593,7 +597,8 @@ end
 function SmartAI:isGoodChainPartner(player)
 	player = player or self.player
 	if hasBuquEffect(player) or (self.player:hasSkill("niepan") and self.player:getMark("@nirvana") > 0) or self:needToLoseHp(player)
-		or self:getDamagedEffects(player) or (player:hasSkill("fuli") and player:getMark("@laoji") > 0) then
+		or self:getDamagedEffects(player) or (player:hasSkill("fuli") and player:getMark("@laoji") > 0)
+		or (not self:damageIsEffective(player, sgs.DamageStruct_Fire, nil, nil, 1, false) and self:damageIsEffective(player, sgs.DamageStruct_Fire, nil, nil, 1, true)) then
 		return true
 	end
 	return false
@@ -603,6 +608,7 @@ function SmartAI:isGoodChainTarget(who, source, nature, damagecount, card)
 	source = source or self.player
 
 	if source:hasSkill("jueqing") then return not self:isFriend(who) end
+	if source:getMark("&motiao_using") > 0 then return not self:isFriend(who) end
 	if not who:isChained() then return not self:isFriend(who) end
 	nature = nature or sgs.DamageStruct_Fire
 	damagecount = damagecount or 1
@@ -633,7 +639,7 @@ function SmartAI:isGoodChainTarget(who, source, nature, damagecount, card)
 	elseif not (card and card:isKindOf("Slash")) and hasWulingEffect("@wind") and nature == sgs.DamageStruct_Fire then damagecount = damagecount + 1
 	end
 
-	if not self:damageIsEffective(who, nature, source, card) then return false end
+	if not self:damageIsEffective(who, nature, source, card, damagecount, true) then return false end
 	if card and card:isKindOf("TrickCard") and not self:hasTrickEffective(card, who, self.player) then return false end
 
 	if who:hasArmorEffect("silver_lion") then damagecount = 1 end
@@ -653,20 +659,24 @@ function SmartAI:isGoodChainTarget(who, source, nature, damagecount, card)
 				if hasWulingEffect("wind") then dmg = dmg + 1 end
 			elseif nature == sgs.DamageStruct_Thunder then
 				if hasWulingEffect("@thunder") then dmg = dmg + 1 end
+				if target:hasArmorEffect("toujing") then dmg = dmg + 1 end
 			end
 		end
 		if self:cantbeHurt(target, source, damagecount) then newvalue = newvalue - 100 end
+		if not self:damageIsEffective(target, nature, source, card, dmg, false) and self:damageIsEffective(target, nature, source, card, dmg, true) then newvalue = newvalue + 2 end
 		if damagecount + (dmg or 0) >= target:getHp() then
 			newvalue = newvalue - 2
 			if target:isLord() and not self:isEnemy(target) then killlord = true end
 			if self:isEnemy(target) then kills = kills + 1 end
 		else
-			if self:isEnemy(target) and source:getHandcardNum() < 2 and target:hasSkills("ganglie|neoganglie|xuelin") and source:getHp() == 1
-				and self:damageIsEffective(source, nil, target) and peach_num < 1 then newvalue = newvalue - 100 end
-			if target:hasSkill("vsganglie") then
+			if self:isEnemy(target) and target:hasSkills("ganglie|neoganglie|xuelin|xianrou") and source:getHp() == 1	--避免被反伤反死
+				and self:damageIsEffective(source, nil, target, nil, dmg, true) and peach_num < 1 then
+				newvalue = newvalue - 100
+			end
+			if target:hasSkill("vsganglie") then	--避免队友被指向性反伤反死
 				local can
 				for _, t in ipairs(self:getFriends(source)) do
-					if t:getHp() == 1 and t:getHandcardNum() < 2 and self:damageIsEffective(t, nil, target) and peach_num < 1 then
+					if t:getHp() == 1 and t:getHandcardNum() < 2 and self:damageIsEffective(t, nil, target, nil, dmg, true) and peach_num < 1 then
 						if t:isLord() then
 							newvalue = newvalue - 100
 							if not self:isEnemy(t) then killlord = true end
@@ -695,7 +705,7 @@ function SmartAI:isGoodChainTarget(who, source, nature, damagecount, card)
 	if nature == sgs.DamageStruct_Normal then return good >= bad end
 
 	for _, player in sgs.qlist(self.room:getAllPlayers()) do
-		if player:objectName() ~= who:objectName() and player:isChained() and self:damageIsEffective(player, nature, source, card)
+		if player:objectName() ~= who:objectName() and player:isChained() and self:damageIsEffective(player, nature, source, card, damagecount, true)
 			and not (card and card:isKindOf("FireAttack") and not self:hasTrickEffective(card, who, self.player)) then
 			local getvalue = getChainedPlayerValue(player, 0)
 			if kills == #self.enemies and not killlord and sgs.getDefenseSlash(player, self) < 2 then
@@ -777,7 +787,7 @@ function SmartAI:needNotChained(player)		--需要不被横置
 end
 
 function SmartAI:useCardIronChain(card, use)
-	local needTarget = (card:getSkillName() == "guhuo" or card:getSkillName() == "nosguhuo" or card:getSkillName() == "qice")
+	local needTarget = (card:getSkillName() == "guhuo" or card:getSkillName() == "nosguhuo" or card:getSkillName() == "qice" or card:getSkillName() == "biying")	--这些技能转化的铁索不能重铸
 	if self.player:hasSkills("tianqiao") and card:getId() == self.room:getDrawPile():first() then needTarget = true end	--不允许AI用天巧重铸
 	if not (self.player:hasSkills("noswuyan") and needTarget) then use.card = card end	--直接重铸
 	if self.player:hasSkills("yueying") and self.player:getMark("yueying_used") == 0 and not needTarget then use.card = card end	--月盈，直接重铸
@@ -988,6 +998,7 @@ sgs.ai_skill_cardask["@fire-attack"] = function(self, data, pattern, target)
 				elseif target:objectName() == self.player:objectName() then
 					if self.player:isChained() and self:isGoodChainTarget(self.player, self.player, sgs.DamageStruct_Fire, nil, fire_attack)
 					and self.player:getHandcardNum() > 1 and not self.player:hasSkill("jueqing") and not self.player:hasSkill("mingshi")
+					and self.player:getMark("&motiao_using") == 0	--抹挑生效时不火攻自己
 					and not self.room:isProhibited(self.player, self.player, fire_attack)
 					and self:damageIsEffective(self.player, sgs.DamageStruct_Fire, self.player, fire_attack) and not self:cantbeHurt(self.player)
 					and self:hasTrickEffective(fire_attack, self.player) then
@@ -1124,7 +1135,7 @@ function SmartAI:useCardFireAttack(fire_attack, use)
 
 	if (not use.current_targets or not table.contains(use.current_targets, self.player:objectName()))
 		and self.role ~= "renegade" and can_FireAttack_self and self.player:isChained() and self:isGoodChainTarget(self.player, self.player, sgs.DamageStruct_Fire, nil, fire_attack)
-		and self.player:getHandcardNum() > 1 and not self.player:hasSkill("jueqing") and not self.player:hasSkill("mingshi")
+		and self.player:getHandcardNum() > 1 and not self.player:hasSkill("jueqing") and not self.player:hasSkill("mingshi") and self.player:getMark("&motiao_using") == 0
 		and not self.room:isProhibited(self.player, self.player, fire_attack)
 		and self:damageIsEffective(self.player, sgs.DamageStruct_Fire, self.player, fire_attack) and not self:cantbeHurt(self.player)
 		and self:hasTrickEffective(fire_attack, self.player) then

@@ -239,7 +239,7 @@ end
 
 --禁止获得的技能，包括：部分非即时的遗言技能、涉及变身的技能、涉及给其他角色技能按钮的技能（如月引、秘恋，因为换角色会掉）
 local IFModeCheerSystem_banned_list = {"luajiantui", "luajiyuan", "luashenhui", "youlian", "yanling", "heli", "qiji", "milian", "yuguang", "yueyin", "milian", "shisu", "xingji"}
-local luaIFModeCheerSystem_extra_generals_list = {"bingtang_if", "jinghua_if", "hanazono_serena_if", "xiaorou_if", "xiachuanyueyue_if", "baishenyao_if", "xingxi_if", "otome_oto_if", "katya_if"}	--额外加入技能池的角色
+local luaIFModeCheerSystem_extra_generals_list = {"bingtang_if", "hanazono_serena_if", "xiaorou_if", "xiachuanyueyue_if", "baishenyao_if", "xingxi_if", "otome_oto_if", "katya_if"}	--额外加入技能池的角色
 local luaIFModeCheerSystem_throw_generals_list = {"baishenyao_zhaijiahaibao", "xingxi_tianjiliuxing", "xiachuanyueyue_duzhuoguitu", "xiaorou_rhoxingai"}	--从技能池中排除的角色
 
 IFModeCheerSystem = sgs.CreateTriggerSkill{
@@ -320,6 +320,7 @@ IFModeCheerSystem = sgs.CreateTriggerSkill{
 				local canget_skills = {}
 				for _, general_name in ipairs(generals) do
 					local general = sgs.Sanguosha:getGeneral(general_name)
+					if not general then continue end	--防止添加了不存在的角色（如删人）
 					local skills = general:getSkillList()	--General::getSkillList()无参数，后面使用isVisible确定技能不是隐藏技能
 					for _, skill in sgs.qlist(skills) do
 						if skill:isVisible() and skill:getFrequency() ~= sgs.Skill_Wake and not skill:isLordSkill() and not table.contains(IFModeCheerSystem_banned_list, skill:objectName()) then

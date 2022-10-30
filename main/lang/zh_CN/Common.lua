@@ -290,7 +290,7 @@ CommonTranslationTable = {
 	["CAPITAL(10)"] = "十",
 	
 	["GAME_NAME"] = "Vup杀",
-	["CURRENT_VERSION"] = "V0.4.1.3z",	--版本号不能带汉字
+	["CURRENT_VERSION"] = "V0.4.1.4a",	--版本号不能带汉字
 	["ASK_FOR_UPDATE_LOG1"] = "你的版本与服务器不一致，请及时更新！<br/>",
 	["ASK_FOR_UPDATE_LOG2"] = "Vup杀联机QQ群号：1075276181",
 	["FIND_SERVER"] = "公共服务器",
