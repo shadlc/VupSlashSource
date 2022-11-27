@@ -1167,6 +1167,11 @@ function SmartAI:needBear(player, Not_use_any, overflow, except_skills)
 			return true
 		end
 		
+		--采集（体力值<4时，尽量让手牌数=体力值，不管喝酒）
+		if player:hasSkill("caiji") and not table.contains(excepts, "caiji") and player:getPhase() ~= sgs.Player_NotActive and player:getHp() < 4 and player:getHandcardNum() == player:getHp() then
+			return true
+		end
+		
 		----忍戒
 		--if player:hasSkills("renjie+baiyin") and not player:hasSkill("jilve") and player:getMark("@bear") < 4 then
 		--	return true

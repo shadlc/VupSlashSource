@@ -95,6 +95,7 @@ function EnterHuangLvMode(room, current)
 	local players = {lord, second, third, forth}
 	room:acquireSkill(lord,"#HLModeBalance") --先手平衡规则
 	room:acquireSkill(lord,"#HLModeBalanceRole") --先手平衡规则
+	room:setPlayerMark(lord, "HuangLvBalanceRule", 1)	--先手平衡规则标记
 	for _,p in ipairs(players) do
 		--room:acquireSkill(p,"#HLModeTired") --疲劳回合规则，已改为全局技能
 		--room:acquireSkill(p, "#HLModeRewardAndPunish") --击杀奖惩规则，已耦合进源码
@@ -301,16 +302,15 @@ HLModeBalance = sgs.CreateTriggerSkill{
 	frequency = sgs.Skill_Compulsory,
 	events = {sgs.DrawNCards},
 	on_trigger = function(self, event, player, data)
-		if player:getMark("HuangLvBalanceRule") == 0 then
+		if player:getMark("HuangLvBalanceRule") == 1 then
 			local room = player:getRoom()
-			room:setPlayerMark(player, "HuangLvBalanceRule", 1)		
+			room:setPlayerMark(player, "HuangLvBalanceRule", 0)		
 			local msg = sgs.LogMessage()
 			msg.type = "#BalanceRule"
 			msg.from = player
 			room:sendLog(msg) --发送提示信息
 			local n = data:toInt() - 1
 			data:setValue(n)
-			
 		end
 	end,
 }
@@ -699,7 +699,9 @@ HLsurrenderCard = sgs.CreateSkillCard{
 				--room:killPlayer(source)
 				--room:loseMaxHp(source, source:getMaxHp())
 				
-				for _,to in sgs.qlist(room:getAllPlayers()) do	--屏蔽所有角色的技能
+				for _,to in sgs.qlist(room:getAllPlayers()) do	--屏蔽所有角色的技能并改变读条时间
+					room:setPlayerMark(to, "Response_Time_Fix", 5000)	--读条时间固定5秒
+					room:setPlayerMark(to, "Global_PreventPeach", 1)	--完杀效果
 					room:setPlayerMark(to, "skill_banned", 1)
 				end
 				room:loseHp(source, source:getHp()+5834)

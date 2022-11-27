@@ -628,9 +628,65 @@ footnotes: function () {
 存活 -> 在场 | 死亡 -> 离场<br/>
 武将 -> 角色 | 击杀 -> 击败<br/>
 扣置于武将牌上/移出游戏 -> 除外<br/>
-濒死 -> 濒危
+濒危 -> 濒危
 </tt>
 </div></div>
+<div class="paragraph"><br><p>以下三国杀描述将进行<s>本地化处理</s></p></div>
+<div class="listingblock">
+<div class="content">
+<tt>
+<font color='orange'>修改前</font>：你计算与其他角色的距离-1<br/>
+<font color='blue'>修改后</font>：你→其他角色 距离-1<br/>
+<br/>
+<font color='orange'>修改前</font>：你计算与其他角色的距离-1，其他角色计算与你的距离-1<br/>
+<font color='blue'>修改后</font>：你↔其他角色 距离-1<br/>
+<br/>
+<font color='orange'>修改前</font>：摸牌阶段……本阶段你的额定摸牌数+1<br/>
+<font color='blue'>修改后</font>：摸牌阶段……本阶段你的摸牌数+1<br/>
+<br/>
+<font color='orange'>修改前</font>：（未提及摸牌阶段）你的额定摸牌数+1<br/>
+<font color='blue'>修改后</font>：（未提及摸牌阶段）你的通常摸牌数+1<br/>
+<br/>
+<font color='orange'>修改前</font>：额定目标数上限+1<br/>
+<font color='blue'>修改后</font>：可指定目标数+1<br/>
+</tt>
+</div></div>
+
+</div>
+</div>
+
+<div class="sect1">
+<h2 id="_">现有机制差异</h2>
+<div class="sectionbody">
+
+<div class="sect2"><br>
+<h3 id="__">指定目标事件</h3>
+<div class="paragraph"><br><p>在三国杀中，一名角色使用牌指定N个目标，将会产生N个“指定目标时”“指定目标后”时机。<br>在Vup杀中，一名角色使用牌指定N个目标，只会产生1个“指定目标时”“指定目标后”时机。<br><br>在三国杀中的“你使用牌指定一名角色为目标后”将会依次询问对每名目标是否发动技能。<br>在Vup杀中，类似技能通常会对所有目标同时生效，或询问玩家要对哪名目标发动技能。</p></div>
+</div>
+
+<div class="sect2">
+<h3 id="__">轮次</h3>
+<div class="paragraph"><br><p>Vup杀中“轮次开始时”为“首位行动的角色”的回合开始前。<br>若一号位角色于自己的回合内离场，则“首位行动的角色”会被顺延给二号位，因此会直接开启新的轮次。<br>Vup杀的轮次数可以被技能更改。增加轮次数不会触发“轮次开始时”时机，也不会影响持续一轮的延时效果的结算，仅仅只是增加了轮次计数。</p></div>
+</div>
+
+<div class="sect2">
+<h3 id="__">转化类技能与询问使用/打出的交互</h3>
+<div class="paragraph"><br><p>询问某角色使用/打出牌时，只有这两种情况允许该角色通过技能使用/打出转化的牌：①询问某角色使用【杀】；②询问某角色打出一张特定牌。<br/>注：①仅限于令某角色使用一张【杀】这种描述。其他描述则不允许转化，如“其可以使用一张基本牌”、“其依次使用牌堆顶四张牌中的【杀】”等。</p></div>
+<div class="title">举例</div>
+<div class="listingblock">
+	<div class="content"><tt>
+		<font color='orange'>可转化的例子</font>：
+		<br>〖作业〗……然后其须对其攻击范围内你选择的另一名角色使用一张【杀】……
+		<br>〖渴可〗……然后其可以对你使用一张【杀】……
+		<br>〖解忧〗……你可以打出一张【闪】……
+		<br>
+		<br><font color='blue'>不可转化的例子</font>：
+		<br>〖星移〗你于回合外获得手牌后，你可以使用其中一张或弃置之。
+		<br>〖月潮〗……获得场上的一张牌，然后你可以使用之。
+		<br>〖贯袭〗……你可以以其为唯一目标使用一张手牌……
+		<br>〖浮光〗……赢的角色须使用其拼点牌……
+		<br>〖秘恋〗……观看目标的手牌，<font color='#DC143C'><u><b>2级</b> 你可以使用其中一张</font>……
+	</tt></div>
 </div>
 </div>
 
@@ -672,6 +728,11 @@ footnotes: function () {
 </div>
 
 <div class="sect2">
+<h3 id="__">复活</h3>
+<div class="paragraph"><br><p>令一名已离场的角色重新回到游戏。<br>若没有特殊说明，复活的角色体力上限不变，体力值将被设置为满体力。<br>在暗身份模式中，由于该角色已经离场过，因此复活后其身份依旧公开。<br>与“复活”“离场后”相关的技能，不受角色离场失去技能的影响，一次适用后依旧正常生效。</p></div>
+</div>
+
+<div class="sect2">
 <h3 id="__">变化</h3>
 <div class="paragraph"><br><p>直接变成另一个角色，技能也会一起替换。<br>变化不会刷新角色状态，如2体力的雪狐桑因“巧绘”变化为6体力上限的雪咕咕时，雪咕咕的体力值为2/6。</p></div>
 </div>
@@ -687,8 +748,8 @@ footnotes: function () {
 <div class="paragraph"><br><p>Vup杀允许体力值>体力上限。</p></div>
 <div class="listingblock">
 	<div class="content"><tt>
-		体力值>0时：角色不会离场或进入濒死状态；<br/>
-		体力值=0时：若体力上限>0则进入濒死状态；若体力上限=0则直接离场。
+		体力值>0时：角色不会离场或进入濒危状态；<br/>
+		体力值≤0时：若体力上限>0则进入濒危状态；若体力上限≤0则直接离场。
 	</tt></div>
 </div>
 <div class="paragraph"><p>体力上限为回复体力值的上限，当回复量超过体力上限时，就会产生回复溢出。</p></div>
@@ -734,7 +795,7 @@ footnotes: function () {
 
 <div class="sect2">
 <h3 id="__">对方</h3>
-<div class="paragraph"><br><p>拼点流程中指与你拼点的另一名角色。<br>使用流程中指目标角色。<br/>响应流程中指来源牌的使用者。</p></div>
+<div class="paragraph"><br><p>拼点流程中指与某角色拼点的另一名角色。<br>使用流程中指 使用者/目标角色 中的另一方。<br/>响应流程中指 来源牌的使用者/响应者 中的另一方。</p></div>
 </div>
 
 <div class="sect2">
@@ -764,7 +825,7 @@ footnotes: function () {
 
 <div class="sect2">
 <h3 id="__">重铸</h3>
-<div class="paragraph"><br><p>这个概念与三国杀基本相同，但这里补充几点规则集未说明的部分：<br>1.重铸的摸牌者是被重铸牌的原持有者，与重铸者无关<br>2.多张牌同时重铸也只摸一张牌</p></div>
+<div class="paragraph"><br><p>这个概念与三国杀基本相同，但这里补充几点规则集未说明的部分：<br>1.重铸的摸牌者是被重铸牌的原持有者，与重铸者无关<br>2.（暂定）多张牌同时重铸也只摸一张牌。</p></div>
 </div>
 
 <div class="sect2">
@@ -779,7 +840,7 @@ footnotes: function () {
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-更新时间 2022/10/21
+更新时间 2022/11/23
 </div>
 </div>
 </body>

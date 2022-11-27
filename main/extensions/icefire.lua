@@ -8,7 +8,7 @@ IFModeSkillAnjiang = sgs.General(extension, "IFModeSkillAnjiang", "god", 5, true
 --翻译信息
 sgs.LoadTranslationTable{
 	["icefire"] = "冰火歌会",
-	["04_if_modename"] = "4 人局 [冰火歌会 三回战]",
+	["04_if_modename"] = "4 人局 [冰火歌会 四回战]",
 	["ice_leader"] = "冰队队长",
 	["fire_leader"] = "火队队长",
 	["if_iget_1"] = "田汐汐+冰队选择一名队员",
@@ -237,10 +237,10 @@ function loseCheer(player, count)
 	end
 end
 
---禁止获得的技能，包括：部分非即时的遗言技能、涉及变身的技能、涉及给其他角色技能按钮的技能（如月引、秘恋，因为换角色会掉）
+--禁止获得的技能，包括：部分非即时的遗言技能、涉及变身的技能、涉及给其他角色技能按钮的技能（如月引、秘恋，因为换角色会掉）、部分特例
 local IFModeCheerSystem_banned_list = {"luajiantui", "luajiyuan", "luashenhui", "youlian", "yanling", "heli", "qiji", "milian", "yuguang", "yueyin", "milian", "shisu", "xingji"}
-local luaIFModeCheerSystem_extra_generals_list = {"bingtang_if", "hanazono_serena_if", "xiaorou_if", "xiachuanyueyue_if", "baishenyao_if", "xingxi_if", "otome_oto_if", "katya_if"}	--额外加入技能池的角色
-local luaIFModeCheerSystem_throw_generals_list = {"baishenyao_zhaijiahaibao", "xingxi_tianjiliuxing", "xiachuanyueyue_duzhuoguitu", "xiaorou_rhoxingai"}	--从技能池中排除的角色
+local luaIFModeCheerSystem_extra_generals_list = {"bingtang_if", "hanazono_serena_if", "xiaorou_if", "xiachuanyueyue_if", "baishenyao_if", "xingxi_if", "otome_oto_if", "katya_if", "takatsuki_ritsu", "chigusa_hana"}	--额外加入技能池的角色
+local luaIFModeCheerSystem_throw_generals_list = {"baishenyao_zhaijiahaibao", "xingxi_tianjiliuxing", "xiachuanyueyue_duzhuoguitu", "xiaorou_rhoxingai", "tisi_sishenshejishi"}	--从技能池中排除的角色
 
 IFModeCheerSystem = sgs.CreateTriggerSkill{
 	name = "IFModeCheerSystem",
@@ -436,3 +436,83 @@ sgs.LoadTranslationTable{
 	["@Cheer_7"] = "应援力",
 	["@Cheer_8"] = "应援力",
 }
+
+--[[
+	规则：接力规则
+	内容：玩家可以主动离场，然后获得2应援力
+	备注：
+]]--
+
+IFRelayCard = sgs.CreateSkillCard{
+	name = "IFRelayCard",
+	target_fixed = true,
+	will_throw = false,
+	filter = function(self, targets, to_select)
+		return false
+	end,
+	on_use = function(self, room, source, targets)
+		room:setPlayerMark(source, "Response_Time_Fix", 5000)	--读条时间固定5秒
+		if source:askForSkillInvoke("IFRelay", sgs.QVariant("choice:")) then
+			room:setPlayerMark(source, "Response_Time_Fix", 0)
+			
+			local log = sgs.LogMessage()
+			log.from = source
+			log.type = "#IFRelay"
+			room:sendLog(log)	--显示技能发动提示信息
+			
+			room:killPlayer(source)
+			
+			if source:isAlive() then
+				--room:attachSkillToPlayer(source, "IFRelay")
+				gainCheer(source, 2)
+			end
+		else
+			local log = sgs.LogMessage()
+			log.from = source
+			log.type = "#IFRelayNo"
+			room:sendLog(log)	--显示技能发动提示信息
+		end
+		room:setPlayerMark(source, "Response_Time_Fix", 0)
+	end
+}
+IFRelay = sgs.CreateZeroCardViewAsSkill{
+	name = "IFRelay&",
+	view_as = function()
+		return IFRelayCard:clone()
+	end,
+	enabled_at_play = function(self, player)
+		return not player:hasUsed("#IFRelayCard")
+	end
+}
+
+IFModeSkillAnjiang:addSkill(IFRelay)
+
+
+IFModeRelayInitial = sgs.CreateTriggerSkill{
+	name = "#IFModeRelayInitial",
+	frequency = sgs.Skill_Compulsory,
+	events = {sgs.GameStart, sgs.BuryVictim},
+	global = true,
+	on_trigger = function(self, event, player, data, room)
+		if room:getMode() ~= "04_if" then return false end
+		if event == sgs.GameStart then
+			room:attachSkillToPlayer(player, "IFRelay")
+		elseif event == sgs.BuryVictim then	--离场后重新获得此技能
+			room:attachSkillToPlayer(player, "IFRelay")
+		end
+	end,
+	priority = -2,
+}
+--添加规则
+IFModeSkillAnjiang:addSkill(IFModeRelayInitial)
+--翻译信息
+sgs.LoadTranslationTable{
+	["IFRelay"] = "接力",
+	["ifrelay"] = "准备接力",
+	[":IFRelay"] = "出牌阶段限一次，你可以离场，然后获得2应援力。",
+	["$IFRelay"] = "",
+	["IFRelay:choice"] = "你真的要接力吗？",
+	["#IFRelay"] = "%from 决定接力",
+	["#IFRelayNo"] = "%from 取消接力",
+}
+

@@ -342,7 +342,7 @@ config = {
 	},
 	
 	--冰火歌会模式
-	--角色池：白神遥 步玎 红晓音 西魔幽 夏鹤仪 绫奈奈奈 东爱璃 星汐 笙歌 冰糖 花园serena 绮良 次元酱 木糖纯 诗小雅 小希小桃 小柔 兰音 艾露露 山椒阿露波 花满 雪狐 夏川玥玥 穆小泠 早凉 露蒂丝 海桑 乙女音
+	--角色池：白神遥 步玎 红晓音 西魔幽 夏鹤仪 绫奈奈奈 东爱璃 星汐 笙歌 冰糖 花园serena 绮良 次元酱 木糖纯 诗小雅 小希小桃 小柔 兰音 艾露露 山椒阿露波 花满 雪狐 夏川玥玥 穆小泠 早凉 露蒂丝 海桑 乙女音 高槻律 千草はな
 	if_generals = {
 		"baishenyao_if",
 		"buding_qiaoxinmiyou",
@@ -374,7 +374,9 @@ config = {
 		"haisang_meiguiwangzi",
 		"otome_oto_if",
 		"nainailiya_yuanbenlinyuan",
-		"katya_if"
+		"katya_if",
+		"takatsuki_ritsu",
+		"chigusa_hana"
 	},
 	
 	convert_pairs = {

@@ -290,7 +290,10 @@ CommonTranslationTable = {
 	["CAPITAL(10)"] = "十",
 	
 	["GAME_NAME"] = "Vup杀",
-	["CURRENT_VERSION"] = "V0.4.1.4a",	--版本号不能带汉字
+	["CURRENT_VERSION"] = "V0.4.2a",	--版本号不能带汉字
+	--版本新角色
+	["VERSION_NEW_CHARACTER"] = "bingyuanbanling_yaoyaoyouling|mengcike_zuishengmengsi|naiyi_chongqunzhixin|nimo_yuanqixiequan|tisi_sishenshejishi|chigusa_hana|zhenlijiang_mofashaoshu|yuexi_cuozaoqiuyouti",
+	
 	["ASK_FOR_UPDATE_LOG1"] = "你的版本与服务器不一致，请及时更新！<br/>",
 	["ASK_FOR_UPDATE_LOG2"] = "Vup杀联机QQ群号：1075276181",
 	["FIND_SERVER"] = "公共服务器",
@@ -398,6 +401,8 @@ CommonTranslationTable = {
 	["INTERACTIVE"] = "互动",
 	["SEND_FLOWER"] = "送花",
 	["SEND_EGG"] = "投蛋",
+	["NEW_CHARACTER_TOOLTIP"] = "版本新上线角色",
+	["DISCARD_OVERHALF_HINT"] = "提示：需要弃置的牌较多，你可以使用反选功能",
 }
 
 return CommonTranslationTable

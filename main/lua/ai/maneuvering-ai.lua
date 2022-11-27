@@ -531,7 +531,7 @@ function SmartAI:useCardSupplyShortage(card, use)
 		if enemy:hasSkill("zishou") then value = value + enemy:getLostHp() end
 		--Vup杀 高优先级
 		if enemy:hasSkills("yishou|chouka|wanlong|kunyao|chouzhen") then value = value + 10 end
-		if enemy:hasSkills("xuechi|quanneng|shuoyi|zhuoshi|yuejian_akane|bingsha|liucai") then value = value + 5 end
+		if enemy:hasSkills("xuechi|quanneng|shuoyi|zhuoshi|yuejian_akane|bingsha|liucai|wenyu") then value = value + 5 end
 		if enemy:hasSkills("bianshi|yueying|jinzhou|moyu|jichi|jiyue") then value = value + 3 end
 		
 		if self:isWeak(enemy) then value = value + 5 end

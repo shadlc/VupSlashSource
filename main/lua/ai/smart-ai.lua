@@ -105,7 +105,7 @@ function setInitialTables()
     sgs.masochism_skill =   "guixin|yiji|fankui|jieming|xuehen|neoganglie|ganglie|luaganglie|vsganglie|enyuan|fangzhu|nosenyuan|langgu|quanji" ..
                                         "|zhiyu|renjie|tanlan|tongxin|huashen|duodao|chengxiang|benyu|danxin"..
 										"|luabingcheng|luaquanji_jie|zhongzuo|luadanxin|luatuifeng|luaxingshen|luayiji"..
-										"|jiexin|chuangshi|yishou|yuechao|xunyi|fuzhou_serena|nitai|xuelin|xianrou|jili_magi|geiwoxinxin|chushou|lianmei|xingyun"
+										"|jiexin|chuangshi|yishou|yuechao|xunyi|fuzhou_serena|nitai|xuelin|xianrou|jili_magi|geiwoxinxin|chushou|lianmei|xingyun|huage"
     sgs.wizard_skill =      "guicai|guidao|jilve|tiandu|luoying|noszhenlie|huanshi"..
 										"|lualiuyi|luadongxiao|luatiandu"..
 										"|liuyi|tonggan|moyue|weiliu"
@@ -138,7 +138,7 @@ function setInitialTables()
     sgs.use_lion_skill =         "longhun|duanliang|ol_duanliang|qixi|guidao|noslijian|lijian|jujian|nosjujian|zhiheng|mingce|yongsi|fenxun|gongqi" ..
                         "|yinling|jilve|qingcheng|neoluoyi|diyyicong" ..
                         "|ol_jiewei|luashenzhi_x|jingxie|tianjiang|zhuren"..
-						"|jinzhou|yuechao|jichi|kunyao|qisheng"
+						"|jinzhou|yuechao|jichi|kunyao|qisheng|xianwei"
     sgs.need_equip_skill =      "shensu|mingce|jujian|beige|yuanhu|huyuan|gongqi|nosgongqi|yanzheng|qingcheng|neoluoyi|longhun|shuijian|yinbing|dujin|qizhou" ..
 										"|ol_jiewei|lueming|tianjiang|bianshi"
     sgs.judge_reason =      "bazhen|EightDiagram|wuhun|supply_shortage|tuntian|nosqianxi|nosmiji|indulgence|lightning|baonue"..
@@ -146,17 +146,17 @@ function setInitialTables()
 									"|lualuoshen|luatuntian_jie|luatuntian_jieh|luabaonue|lueming|luaminghu|luaxiaoxi"..
 									"|chouka|shitian|jiexin|huiyu|xingyao|xiangrui|zhuge|xuelin|kecan|fuyin_shayue|xiaoan"
     sgs.straight_damage_skill = "qiangxi|nosxuanfeng|duwu|danshou"..
-										"|luazhenjun|langxi|luaqiangxi|mingyun|ruqin|zijin"
+										"|luazhenjun|langxi|luaqiangxi|mingyun|ruqin|zijin|bujuan|wuji_buding"
     sgs.double_slash_skill = "paoxiao|luapaoxiao|fuhun|tianyi|xianzhen|zhaxiang|lihuo|jiangchi|shuangxiong|qiangwu|luanji|mobileluanji"..
 									"|luafenyin|libeng|zhulie|xingxiong|mingguang"
     sgs.need_maxhp_skill = "yingzi|zaiqi|yinghun|hunzi|juejing|ganlu|zishou|miji|chizhong|xueji"..	--需要已损失体力值的技能（排除亦算类技能）
                         "|quji|xuehen|shude|neojushou|ol_jushou|tannang|fangzhu|nosshangshi|nosmiji"..
 									""
     sgs.bad_skills = "benghuai|wumou|shiyong|yaowu|zaoyao|chanyuan|chouhai|ranshang"..
-								"|luatanbei"
+								"|luatanbei|kecan|suoke|bujiao"
 	sgs.lose_hp_skills = "zhaxiang"
 	sgs.lose_card_skills = "tuntian|luatuntian_jie|luatuntian_jieh|lualimeng"		--新加的，表示屯田类技能
-	sgs.give_card_skills = "enyuan|hongde|yueying|xingyi"		--新加的，表示交给牌后有附加效果的技能
+	sgs.give_card_skills = "enyuan|hongde|yueying|xingyi|yangneng"		--新加的，表示交给牌后有附加效果的技能
 
     sgs.Friend_All = 0
     sgs.Friend_Draw = 1
@@ -338,6 +338,7 @@ function sgs.getDefense(player)
     if player:hasSkill("jieming") then defense = defense + 3 end
     if player:hasSkills("yiji|luayiji") then defense = defense + 3 end
     if player:hasSkills("jiexin|chuangshi") then defense = defense + 3 end
+    if player:hasSkills("huage") then defense = defense + 2 end
     if player:hasSkill("luatuifeng") then defense = defense + 3 end
     if player:hasSkill("guixin") then defense = defense + player:aliveCount() - 1 end
     if player:hasSkill("yuce") then defense = defense + 2 end
@@ -1104,6 +1105,10 @@ function SmartAI:getDynamicUsePriority(card)
 	
     if self.player:hasSkill("jianying") and self.player:getMark("JianyingSuit") == card:getSuit() + 1 and self.player:getMark("JianyingNumber") == card:getNumber() then
         return self:getUsePriority(card) + 50
+    end
+	
+    if self.player:hasSkills(sgs.use_lion_skill) and self.player:getLostHp() > 0 and not self:needToLoseHp(self.player, self.player, false, false, true) and card:isKindOf("SilverLion") then	--经典玩狮子，有玩狮子技能并且需要回血就直接装上，省得技能优先级过高直接在手里用了
+        return self:getUsePriority(card) + 10
     end
 	
     if self.player:hasSkill("shuoyi") and card:getEffectiveId() == self.player:getHandcards():first():getEffectiveId() then	--朔易
@@ -2617,7 +2622,22 @@ function SmartAI:filterEvent(event, player, data)
             self:assignKeep()
         end
     end
-
+	
+	if event == sgs.CardsMoveOneTime and self.player:objectName() == player:objectName() then	--幽缘智商检测成功送花
+		local move = data:toMoveOneTime()
+		local from = nil   -- convert move.from from const Player * to ServerPlayer *
+		local to   = nil   -- convert move.to to const Player * to ServerPlayer *
+		if move.from then from = findPlayerByObjectName(self.room, move.from:objectName(), true) end
+		if move.to   then to   = findPlayerByObjectName(self.room, move.to:objectName(), true) end
+		local reason = move.reason
+		if from and self.player:objectName() == from:objectName() then	--保证只触发一次
+			if reason.m_skillName == "youyuan" and reason.m_reason == sgs.CardMoveReason_S_REASON_GIVE and to and (to:getState() == "robot" or to:getState() == "trust") and self:isEnemy(to, from) then
+				self.room:getThread():delay(250)
+				to:speak(".SendFlower="..from:objectName())
+			end
+		end
+	end
+	
     if self ~= sgs.recorder then return end
 
     if event == sgs.TargetConfirmed then
@@ -3455,11 +3475,15 @@ function SmartAI:askForNullification(trick, from, to, positive)
                 end
                 --自己
                 if self.player:objectName() == to:objectName() then
-                    if self:hasSkills("jieming|yiji|luayiji|guixin|jiexin|chuangshi", self.player) and
+                    if self:hasSkills("jieming|yiji|luayiji|guixin|jiexin|chuangshi|huage", self.player) and
                         (self.player:getHp() > 1 or self:getCardsNum("Peach") > 0 or self:getCardsNum("Analeptic") > 0) then
                         return nil
                     elseif not self:canAvoidAOE(trick) then
                         return null_card
+					else
+						if null_card:getSkillName() == "wenyu" and null_card:isRed() then	--温御响应南蛮优先红杀转无懈
+							return null_card
+						end
                     end
                 end
                 --队友
@@ -3969,15 +3993,12 @@ function SmartAI:getDamageAdjustment(from, to, card, dmg, nature)		--新函数�
     to = to or self.player
 	dmg = dmg or 1
 	nature = nature or sgs.DamageStruct_Normal
-    if not from or not to then self.room:writeToConsole(debug.traceback()) return false end
+    if not from or not to then self.room:writeToConsole(debug.traceback()) return dmg end
     if from:hasSkills("jueqing|lualiezhi") or to:hasSkills("lualiezhi") then
 		return dmg
     end
     if (to:hasArmorEffect("silver_lion") and not IgnoreArmor(from, to)) or to:hasSkills("lijue_akane") then	--白银狮子/离诀
-		return 1
-    end
-    if from:getMark("&motiao_using") > 0 then	--抹挑自肃
-		return math.max(math.min(dmg, 1-from:getMark("caused_damage_in_turn")), 0)
+		dmg = 1
     end
 	--不能在这里用敌我判断！！！
 	--bug:在多人局反贼全部阵亡后变得非常卡顿，smart-ai.lua堆栈溢出
@@ -4028,6 +4049,27 @@ function SmartAI:getDamageAdjustment(from, to, card, dmg, nature)		--新函数�
 	if card and card:isKindOf("Slash") and card:hasFlag("xingyao_hit") then dmg = dmg + 1 end	--星耀杀加伤
     if from:hasSkill("yanzi") and to:isAllNude() then dmg = dmg + 1 end		--腌渍加伤
     if from:hasSkill("jueduan") and nature ~= sgs.DamageStruct_Normal and to:getEquips():length() > from:getEquips():length() then dmg = dmg + 1 end		--绝断加伤
+	if card and card:isKindOf("Duel") and card:getSkillName() == "duopo" then	--夺魄决斗加减伤
+		if self.room:getCardPlace(card:getEffectiveId()) == sgs.Player_PlaceHand or self.room:getCardPlace(card:getEffectiveId()) == sgs.Player_PlaceEquip then	--未使用
+			if (from:hasSkill("duopo") and from:getHp() <= 1) then
+				dmg = dmg + 1
+			end
+			if (self.room:getCurrent():objectName() == to:objectName() and to:getEquips():length() <= 1) then
+				dmg = dmg - 1
+			end
+		else	--使用中
+			if card:hasFlag("duopo_damage") then
+				dmg = dmg + 1
+			end
+			if card:hasFlag("duopo_safe_to_"..to:objectName()) then
+				dmg = dmg - 1
+			end
+		end
+	end
+	
+    if from:getMark("&motiao_using") > 0 then	--抹挑自肃
+		return math.max(math.min(dmg, 1-from:getMark("caused_damage_in_turn")), 0)
+    end
 	
 	return dmg
 end
@@ -4447,7 +4489,7 @@ function SmartAI:getCardNeedPlayer(cards, include_self)
                     if friend:hasSkill("zhaxiang") then
                         return shit, friend
                     end
-                elseif self:hasSkills("guixin|jieming|yiji|nosyiji|luayiji|chengxiang|noschengxiang|jianxiong|luajianxiong|jiexin|chuangshi|nitai", friend) then
+                elseif self:hasSkills("guixin|jieming|yiji|nosyiji|luayiji|chengxiang|noschengxiang|jianxiong|luajianxiong|jiexin|chuangshi|nitai|huage", friend) then
                     return shit, friend
                 end
             end
@@ -4922,8 +4964,14 @@ function SmartAI:getTurnUse()
     for _, card in ipairs(cards) do
         local dummy_use = { isDummy = true }
 
+		if card:getSkillName() == "lianglunche" then	--两轮车距离修正
+			self.player:setFlags("lianglunche_distancefix_AI")
+		end
+		
         local type = card:getTypeId()
         self["use" .. sgs.ai_type_name[type + 1] .. "Card"](self, card, dummy_use)
+		
+		self.player:setFlags("-lianglunche_distancefix_AI")
 
         if dummy_use.card then
             if dummy_use.card:isKindOf("Slash") then
@@ -5684,7 +5732,7 @@ function SmartAI:damageIsEffective_(damageStruct, real_damage)
     end
 	
 	if self:getDamageAdjustment(from, to, card, damage_origin, nature) <= 0 then return false end	--通过伤害调整函数验算，若能将原始伤害减为零则视为免伤
-
+	
     for _, callback in ipairs(sgs.ai_damage_effect) do
         if type(callback) == "function" then
             local is_effective = callback(self, to, nature, from)
@@ -7685,7 +7733,7 @@ function SmartAI:needToThrowHandcard(player, n, method)	--判断某角色是否�
     player = player or self.player
     n = math.min(n or 1, player:getHandcardNum())
 	method = method or sgs.CardMoveReason_S_REASON_DISCARD
-	if self:needKongcheng(player) and player:getHandcardNum() <= n then
+	if self:needKongcheng(player) and not player:isKongcheng() and player:getHandcardNum() <= n then
 		return true
 	end
 	if player:hasSkill("sanre") and method == sgs.CardMoveReason_S_REASON_DISMANTLE then	--散热
@@ -8310,7 +8358,7 @@ function SmartAI:findPlayerToDamage(damage, source, nature, targets, include_sel
                     if target:hasSkills("nosyiji|luayiji|jiexin|chuangshi") then
                         value = value - 20 * count
                     end
-                    if target:hasSkill("yiji") then
+                    if target:hasSkill("yiji|huage") then
                         value = value - 10 * count
                     end
                     if target:hasSkill("jieming") then
@@ -8529,8 +8577,8 @@ function SmartAI:needBearCard(card, player, fatal)	--新函数，输入card和pl
 		end
 	end
 	
-	--有扬歌被翻面且本回合未造成过伤害，不使用伤害牌
-	if player:hasSkill("yangge") and not player:faceUp() and not player:hasFlag("damage_caused_yanggeli") and card:isDamageCard() and not fatal then
+	--有扬歌被翻面且本回合未造成过伤害，回合内（结束阶段除外）不使用伤害牌
+	if player:hasSkill("yangge") and not player:faceUp() and not player:hasFlag("damage_caused_ruqin") and (player:getPhase() ~= sgs.Player_NotActive and player:getPhase() ~= sgs.Player_Finish) and card:isDamageCard() and not fatal then
 		return true
 	end
 	
@@ -8551,13 +8599,13 @@ function SmartAI:needBearCard(card, player, fatal)	--新函数，输入card和pl
 		return has_mishi
 	end
 	
-	--盈异，不溢出时存使用价值低的黑牌
-	if player:hasSkill("yingyi") and self:getOverflow() <= 0 and card:isBlack() and self:getUseValue(card) < 6 and not fatal then
+	--盈异，出牌阶段不溢出时存使用价值低的黑牌
+	if player:hasSkill("yingyi") and self:getOverflow() <= 0 and player:getPhase() == sgs.Player_Play and card:isBlack() and self:getUseValue(card) < 6 and not fatal then
 		return true
 	end
 	
 	--有月见和主公技寻绊时，在有队友、没给过牌的情况下，出牌阶段保存手牌中唯一一张锦囊牌
-	if player:hasSkill("yuejian_akane") and player:hasLordSkill("xunban") and player:getRole() == "lord" and card:isKindOf("TrickCard") and player:getPhase() == sgs.Player_Play and player:getMark("&xunban!") == 0 and #self.friends_noself > 0 and not fatal then
+	if player:hasSkill("yuejian_akane") and player:hasLordSkill("xunban") and player:getRole() == "lord" and player:getPhase() == sgs.Player_Play and card:isKindOf("TrickCard") and player:getMark("&xunban!") == 0 and #self.friends_noself > 0 and not fatal then
 		local count = 0
 		for _, cd in sgs.qlist(player:getCards("h")) do
 			if cd:isKindOf("TrickCard") then
@@ -8569,8 +8617,8 @@ function SmartAI:needBearCard(card, player, fatal)	--新函数，输入card和pl
 		end
 	end
 	
-	--温御，囤杀，只在溢出且有杀的情况下打黑杀（不管危急情况，危急情况更要囤）
-	if player:hasSkill("wenyu") and card:isKindOf("Slash") --[[and not fatal]] then
+	--温御，回合内囤杀，只在溢出且有杀的情况下打黑杀（不管危急情况，危急情况更要囤）
+	if player:hasSkill("wenyu") and card:isKindOf("Slash") and player:getPhase() ~= sgs.Player_NotActive --[[and not fatal]] then
 		local slashnum = 0
 		for _, c in sgs.qlist(player:getHandcards()) do
 			if c:isKindOf("Slash") then
@@ -8581,6 +8629,16 @@ function SmartAI:needBearCard(card, player, fatal)	--新函数，输入card和pl
 		if slashnum <= maxcard and (slashnum <= 1 or self:getOverflow() <= 0 or card:isRed()) then
 			return true
 		end
+	end
+	
+	--采集，回合内（结束阶段除外）自身需要防御时不打伤害，手牌严重溢出时除外（不管危急情况）
+	if player:hasSkill("caiji") and (player:getHp() <= 2 and self:getOverflow() <= 4) and (player:getPhase() ~= sgs.Player_NotActive and player:getPhase() ~= sgs.Player_Finish) and card:isDamageCard() then
+		return true
+	end
+	
+	--夺魄，只用一个装备牌（藏宝图除外），已经有两个以上就不管了
+	if player:hasSkill("duopo") and card:isKindOf("EquipCard") and not card:isKindOf("Cangbaotu") and player:getEquips():length() == 1 and not fatal then
+		return true
 	end
 	
 	--应势，出牌阶段存红桃
@@ -8673,6 +8731,13 @@ function SmartAI:getBestKeepHandcardNum(player, default_value)	--新函数，输
 	end
 	if player:hasSkills("yuanchu") and player:getPhase() ~= sgs.Player_NotActive then	--元初，回合内把牌用到手牌上限的一半
 		return math.max(0, math.floor(player:getMaxCards()/2))
+	end
+	if player:hasSkills("duopo") then	--夺魄，有方块手牌最好打空
+        for _, card in sgs.qlist(player:getHandcards()) do
+			if card:getSuit() == sgs.Card_Diamond then
+				return 0
+			end
+        end
 	end
 	--if player:hasSkills("luayongsi") and player:getPhase() ~= sgs.Player_NotActive then	--庸肆，回合内打空
 	--	return 0

@@ -2523,6 +2523,9 @@ function SmartAI:useCardDuel(duel, use)
 	if self.player:hasSkill("santan") and self.player:getMark("santan_counter") == 2 then	--三叹不可响应
 		n1 = 9999
 	end
+	if not self:damageIsEffective(self.player, sgs.DamageStruct_Normal, target, duel) then	--若伤害对自己无效则自己无视目标的杀数量
+		n1 = 9999
+	end
 	local huatuo = self.room:findPlayerBySkillName("jijiu")
 	local targets = {}
 
@@ -3684,7 +3687,7 @@ function SmartAI:useCardIndulgence(card, use)
 		if enemy:hasSkills("guzheng|luoying|xiliang|guixin|lihun|yinling|gongxin|shenfen|ganlu|duoshi|jueji|zhenggong|moyue") then value = value + 3 end
 		--Vup杀 高优先级
 		if enemy:hasSkills("yishou|choucuo|xianwei|zhuoshi|shuoyi") then value = value + 10 end
-		if enemy:hasSkills("zhuoshi|diyin|cangbao|juanyi|qianchang|quanneng_xiaonai|liucai") then value = value + 5 end
+		if enemy:hasSkills("zhuoshi|diyin|cangbao|juanyi|qianchang|quanneng_xiaonai|liucai|wenyu") then value = value + 5 end
 		if enemy:hasSkills("yinyou|xiange|youlian|heli|jieshuo|bianshi|xingxiong|jiyue") then value = value + 3 end
 		
 		if self:isWeak(enemy) then value = value + 3 end
