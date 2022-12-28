@@ -57,3 +57,14 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
+ 
+      - name: Setup Ossutil
+        uses: manyuanrong/setup-ossutil@v3.0
+        with:
+          endpoint: oss-cn-shanghai.aliyuncs.com
+          access-key-id: LTAI5tCGxrSiF1YiRiL2d18i
+          access-key-secret: Fcbmp1o6aB9goPfH1FMjsg3OZEs2IE
+      - name: Copy to Aliyun OSS
+        run: |
+          ossutil cp -rf vupslash oss://vupslash-test/
+          ossutil cp -rf information.json oss://vupslash-test/
