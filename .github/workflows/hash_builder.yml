@@ -1,4 +1,4 @@
-name: HashBuilder
+name: Deploy
 
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
@@ -13,19 +13,16 @@ on:
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
-  pages: write
+  deploy: write
   id-token: write
 
 # Allow one concurrent deployment
 concurrency:
-  group: "pages"
+  group: "deploy"
   cancel-in-progress: true
 
 jobs:
-  hash_builder:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -46,24 +43,12 @@ jobs:
           cd ./script
           python3 hash.py ${{ steps.branch_info.outputs.name }}
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v2
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          path: './web'
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v1
- 
       - name: Setup Ossutil
         uses: manyuanrong/setup-ossutil@v3.0
         with:
           endpoint: oss-cn-shanghai.aliyuncs.com
-          access-key-id: LTAI5tCGxrSiF1YiRiL2d18i
-          access-key-secret: Fcbmp1o6aB9goPfH1FMjsg3OZEs2IE
+          access-key-id: ${{ secrets.OSS_ID }}
+          access-key-secret: ${{ secrets.OSS_SECRET }}
       - name: Copy to Aliyun OSS
         run: |
           ossutil cp -rf vupslash oss://vupslash-test/
