@@ -41,7 +41,10 @@ if __name__ == '__main__':
 	info_json['description'] = 'A Sanguosha like game but characters is vup'
 	info_json['author'] = '萌龙少主'
 	info_json['website'] = 'https://vupslash.icu'
-	info_json['source_url'] = f'https://github.com/shadlc/VupSlashSource/raw/{branch_name}/vupslash/'
+	if branch_name == "main":
+		info_json['source_url'] = f'https://vupslash-test.oss-cn-shanghai.aliyuncs.com/vupslash/release/main/'
+	else:
+		info_json['source_url'] = f'https://vupslash-test.oss-cn-shanghai.aliyuncs.com/vupslash/develop/main/'
 	info_json['files'] = get_files_list(f'../vupslash/', info_json['source_url'])
 	json_name = f'information.json'
 	os.chdir('../')
