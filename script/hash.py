@@ -33,16 +33,16 @@ def read_version(directory, file):
 		return f.read().split("LocalVersion=")[1].split("\n")[0]
 		
 if __name__ == '__main__':
-	os.chdir('../')
 	version_file = 'version.ini'
 	branch_name = sys.argv[1]
 	info_json = {}
 	info_json['name'] = 'VupSlash'
-	info_json['version'] = read_version('vupslash/',version_file)
+	info_json['version'] = read_version('../vupslash/',version_file)
 	info_json['description'] = 'A Sanguosha like game but characters is vup'
 	info_json['author'] = '萌龙少主'
 	info_json['website'] = 'https://vupslash.icu'
 	info_json['source_url'] = f'https://github.com/shadlc/VupSlashSource/raw/{branch_name}/vupslash/'
-	info_json['files'] = get_files_list(f'vupslash/', info_json['source_url'])
+	info_json['files'] = get_files_list(f'../vupslash/', info_json['source_url'])
 	json_name = f'information.json'
+	os.chdir('../')
 	save_json(info_json, json_name)
