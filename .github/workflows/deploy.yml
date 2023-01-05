@@ -35,7 +35,7 @@ jobs:
       - name: Setup Ossutil
         uses: manyuanrong/setup-ossutil@v3.0
         with:
-          endpoint: oss-cn-shanghai.aliyuncs.com
+          endpoint: oss-cn-beijing.aliyuncs.com
           access-key-id: ${{ secrets.OSS_ID }}
           access-key-secret: ${{ secrets.OSS_SECRET }}
       - name: Copy to Aliyun OSS
