@@ -42,9 +42,9 @@ if __name__ == '__main__':
 	info_json['author'] = '萌龙少主'
 	info_json['website'] = 'https://vupslash.icu'
 	if branch_name == "main":
-		info_json['source_url'] = f'https://vupslash-test.oss-cn-shanghai.aliyuncs.com/vupslash/release/main/'
+		info_json['source_url'] = f'http://file.vupslash.icu/vupslash/release/main/'
 	else:
-		info_json['source_url'] = f'https://vupslash-test.oss-cn-shanghai.aliyuncs.com/vupslash/develop/main/'
+		info_json['source_url'] = f'http://file.vupslash.icu/vupslash/develop/main/'
 	info_json['files'] = get_files_list(f'../vupslash/', info_json['source_url'])
 	json_name = f'information.json'
 	os.chdir('../')

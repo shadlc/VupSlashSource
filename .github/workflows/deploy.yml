@@ -40,5 +40,5 @@ jobs:
           access-key-secret: ${{ secrets.OSS_SECRET }}
       - name: Copy to Aliyun OSS
         run: |
-          ossutil cp -rf vupslash oss://vupslash-test/vupslash/release/main/
-          ossutil cp -rf information.json oss://vupslash-test/vupslash/release/
+          ossutil cp -rf vupslash oss://vsrefresh/vupslash/release/main/
+          ossutil cp -rf information.json oss://vsrefresh/vupslash/release/
